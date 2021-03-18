@@ -2,7 +2,7 @@ require 'sinatra'
 require 'slim'
 require 'sqlite3'
 require 'bcrypt'
-require_relative 
+
 
 
 enable :sessions
@@ -18,13 +18,13 @@ get('/') do
   post('/login') do
     username = params[:username]
     password = params[:password]
-    db = SQLite3::Database.new ('db/todo2021.db ')
+    db = SQLite3::Database.new ('db/databas.db ')
     db.results_as_hash = true
     result = db.execute("SELECT * FROM users WHERE username = ?",username).first
-    pwdigest = result["pwdigest"]
+    password = result["password"]
     id = result["id"]
   
-    if BCrypt::Password.new(pwdigest) == password
+    if BCrypt::Password.new(password) == password
       session[:id] = id 
       redirect('/todos')
     else
@@ -34,7 +34,7 @@ get('/') do
   
   get('/todos') do
     id = session[:id].to_i
-    db = SQLite3::Database.new ('db/todo2021.db ')
+    db = SQLite3::Database.new ('db/databas.db ')
     db.results_as_hash = true
     result = db.execute("SELECT * FROM todos WHERE user_id = ?",id).first
     p "alla todos #{result}"
@@ -49,8 +49,8 @@ get('/') do
   
     if (password == password_comfirm)
       password_digest=BCrypt::Password.create(password)
-      db = SQLite3::Database.new ("db/todo2021.db ")
-      db.execute("INSERT INTO users (username,pwdigest) VALUES (?,?)",username,password_digest)
+      db = SQLite3::Database.new ("db/databas.db ")
+      db.execute("INSERT INTO users (username,password) VALUES (?,?)",username,password_digest)
       redirect("/")
     else
       "fel lösenord"
