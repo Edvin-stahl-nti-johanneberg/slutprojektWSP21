@@ -2,7 +2,8 @@ require 'sinatra'
 require 'slim'
 require 'sqlite3'
 require 'bcrypt'
-require_relative 
+require "byebug"
+
 
 
 enable :sessions
@@ -17,24 +18,24 @@ get('/') do
   
   post('/login') do
     username = params[:username]
-    password = params[:password]
-    db = SQLite3::Database.new ('db/todo2021.db ')
+    password_from_form = params[:password]
+    db = SQLite3::Database.new ('db/databas.db ')
     db.results_as_hash = true
     result = db.execute("SELECT * FROM users WHERE username = ?",username).first
-    pwdigest = result["pwdigest"]
+    password_from_db = result["password"]
     id = result["id"]
   
-    if BCrypt::Password.new(pwdigest) == password
+    if BCrypt::Password.new(password_from_db) == password_from_form
       session[:id] = id 
       redirect('/todos')
     else
-      "fel"
+      "wrong"
     end
   end 
   
   get('/todos') do
     id = session[:id].to_i
-    db = SQLite3::Database.new ('db/todo2021.db ')
+    db = SQLite3::Database.new ('db/databas.db ')
     db.results_as_hash = true
     result = db.execute("SELECT * FROM todos WHERE user_id = ?",id).first
     p "alla todos #{result}"
@@ -44,13 +45,16 @@ get('/') do
   
   post("/users/new") do
   username = params[:username]
-  password = params[:password]
+  password_from_form = params[:password]
   password_comfirm = params[:password_comfirm]
-  
-    if (password == password_comfirm)
-      password_digest=BCrypt::Password.create(password)
-      db = SQLite3::Database.new ("db/todo2021.db ")
-      db.execute("INSERT INTO users (username,pwdigest) VALUES (?,?)",username,password_digest)
+
+    if (password_from_form == password_comfirm)
+      p "Det stämmer"
+      password_digest=BCrypt::Password.create(password_from_form)
+      p "pwdigest är #{password_digest}"
+      db = SQLite3::Database.new("db/databas.db")
+      db.execute("INSERT INTO users (username,password) VALUES (?,?)",username,password_digest)
+      p "vi skickas tillbaks"
       redirect("/")
     else
       "fel lösenord"
