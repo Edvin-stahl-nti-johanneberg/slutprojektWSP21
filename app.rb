@@ -10,6 +10,8 @@ enable :sessions
 
 get('/') do
     slim(:register)
+
+    
   end
   
   get('/showlogin') do
@@ -27,19 +29,19 @@ get('/') do
   
     if BCrypt::Password.new(password_from_db) == password_from_form
       session[:id] = id 
-      redirect('/todos')
+      redirect('/produkt')
     else
       "wrong"
     end
   end 
   
-  get('/todos') do
+  get('/produkt') do
     id = session[:id].to_i
     db = SQLite3::Database.new ('db/databas.db ')
     db.results_as_hash = true
-    result = db.execute("SELECT * FROM todos WHERE user_id = ?",id).first
+    result = db.execute("SELECT * FROM produkt")
     p "alla todos #{result}"
-    slim(:"todos/index",locals:{todos:result})
+    slim(:"produkt/produkt",locals:{produkt:result})
   end
   
   
@@ -60,3 +62,4 @@ get('/') do
       "fel lösenord"
     end
   end
+

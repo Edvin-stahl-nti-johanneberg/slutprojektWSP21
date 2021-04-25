@@ -10,4 +10,4 @@ end
 
 def varukorg()
     varukorg = connect().execute("INSERT INTO")
-    
+end
