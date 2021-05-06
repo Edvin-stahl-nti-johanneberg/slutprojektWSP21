@@ -63,3 +63,70 @@ get('/') do
     end
   end
 
+# Get product
+get('/produkt/:id') do
+  session_id = session[:id]
+  
+  if session_id == nil
+    redirect('/login')
+    return
+  end
+
+  id = params[:id]
+  db = SQLite3::Database.new ('db/databas.db ')
+  result =  db.execute("SELECT * FROM produkt WHERE id = ?", id)
+  slim(:"produkt/produkt", locals: { produkt: result[0] })
+end
+
+# Delete product
+delete('/produkt/:id') do
+  session_id = session[:id]
+  
+  if session_id == nil
+    redirect('/login')
+    return
+  end
+
+  id = params[:id]
+  db = SQLite3::Database.new ('db/databas.db ')
+  db.execute("DELETE FROM produkts WHERE id = ?", id)
+  redirect('/')
+end
+
+# Update product
+put('/produkt/:id') do
+  session_id = session[:id]
+  
+  if session_id == nil
+    redirect('/login')
+    return
+  end
+
+  id = params[:id]
+  db = SQLite3::Database.new ('db/databas.db ')
+  titel = params[:titel]
+  besk = params[:beskrivning]
+  pris = params[:pris]
+
+  db.results_as_hash = true
+  result = db.execute("UPDATE produkts SET content=? WHERE id=?", todo, id).first
+  redirect('/')
+end
+
+# Create new product
+post('/produkt') do
+  session_id = session[:id]
+  
+  if session_id == nil
+    redirect('/login')
+    return
+  end
+  db = SQLite3::Database.new ('db/databas.db ')
+  titel = params[:titel]
+  besk = params[:beskrivning]
+  pris = params[:pris]
+  db.results_as_hash = true
+  db.execute("INSERT INTO produkt (titel, beskrivning, pris) VALUES (?,?,?)", titel, besk, pris)
+  redirect('/produkt')
+end
+
