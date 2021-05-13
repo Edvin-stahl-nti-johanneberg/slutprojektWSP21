@@ -24,6 +24,7 @@ get('/') do
     db = SQLite3::Database.new ('db/databas.db ')
     db.results_as_hash = true
     result = db.execute("SELECT * FROM users WHERE username = ?",username).first
+    p "password #{result}"
     password_from_db = result["password"]
     id = result["id"]
   
@@ -34,12 +35,12 @@ get('/') do
       "wrong"
     end
   end 
-  
+  #anropar databas om produkt
   get('/produkt') do
     id = session[:id].to_i
     db = SQLite3::Database.new ('db/databas.db ')
     db.results_as_hash = true
-    result = db.execute("SELECT * FROM produkt")
+    result = db.execute("SELECT * FROM produkt Where user_id = #{id} ")
     p "alla todos #{result}"
     slim(:"produkt/produkt",locals:{produkt:result})
   end
@@ -126,7 +127,7 @@ post('/produkt') do
   besk = params[:beskrivning]
   pris = params[:pris]
   db.results_as_hash = true
-  db.execute("INSERT INTO produkt (titel, beskrivning, pris) VALUES (?,?,?)", titel, besk, pris)
+  db.execute("INSERT INTO produkt (titel, beskrivning, pris, user_id) VALUES (?,?,?,?)", titel, besk, pris, session_id)
   redirect('/produkt')
 end
 
