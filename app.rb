@@ -8,6 +8,24 @@ require "byebug"
 
 enable :sessions
 
+=begin
+before do
+    path = request.path_info
+    whitelist = ['/', '/login','/showlogin', 'produkt','user/new']
+    redirect = true
+
+    whitelist.each do |e|
+      if path == e
+        redirect = false
+      end
+    end
+
+    if session[:id].nil? and redirect
+      redirect('/')
+    end
+  end
+=end
+
 get('/') do
     slim(:register)
 
@@ -80,7 +98,7 @@ get('/produkt/:id') do
 end
 
 # Delete product
-delete('/produkt/:id') do
+post('/produkt/:id/delete') do
   session_id = session[:id]
   
   if session_id == nil
@@ -90,8 +108,8 @@ delete('/produkt/:id') do
 
   id = params[:id]
   db = SQLite3::Database.new ('db/databas.db ')
-  db.execute("DELETE FROM produkts WHERE id = ?", id)
-  redirect('/')
+  db.execute("DELETE FROM produkt WHERE id = ?", id)
+  redirect('/produkt')
 end
 
 # Update product
@@ -106,7 +124,7 @@ put('/produkt/:id') do
   id = params[:id]
   db = SQLite3::Database.new ('db/databas.db ')
   titel = params[:titel]
-  besk = params[:beskrivning]
+  beskrivning = params[:beskrivning]
   pris = params[:pris]
 
   db.results_as_hash = true
@@ -128,6 +146,22 @@ post('/produkt') do
   pris = params[:pris]
   db.results_as_hash = true
   db.execute("INSERT INTO produkt (titel, beskrivning, pris, user_id) VALUES (?,?,?,?)", titel, besk, pris, session_id)
+  redirect('/produkt')
+end
+#ändra produkt
+post('/produkt/:id/update') do
+  session_id = session[:id]
+  
+  if session_id == nil
+    redirect('/login')
+    return
+  end
+  db = SQLite3::Database.new ('db/databas.db ')
+  titel = params[:titel]
+  besk = params[:beskrivning]
+  pris = params[:pris]
+  db.results_as_hash = true
+  db.execute("update produkt set titel=?, beskrivning=?, pris=? where produkt.id = ? ",titel, besk, pris, params[:id]) 
   redirect('/produkt')
 end
 

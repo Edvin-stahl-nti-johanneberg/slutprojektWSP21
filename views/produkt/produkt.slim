@@ -21,18 +21,34 @@
                 input type="text" name="beskrivning" placeholder="beskrivning"
                 input type="number" name="pris" value="pris" placeholder="pris"
                 input type="submit" value="Lägg upp"
-
+/#ska fixa så man kan uppdatera
+.modal id="myModal"
+    .modal-content 
+        .postwrap
+            form action="/produkt" method="POST"
+                input type="text" name="titel" placeholder="titel"
+                input type="text" name="beskrivning" placeholder="beskrivning"
+                input type="number" name="pris" value="pris" placeholder="pris"
+                input type="submit" value="uppdatera"
 .wrap2
     - produkt.each do |produkt|
             .card
-                a href="/produkt/#{produkt['id']}"
-                    img.post src="/img/1.jpg" 
+                a href='/produkt/#{produkt["id"]}'
+                    img.post src="/img/169242_1_xnl.jpg" 
                     .container
                         p.bold = produkt["titel"]
 
+                        
+                        p.bold = produkt["beskrivning"]
                         p = produkt["pris"].to_s + " kr"
-            form method="DELETE" action="/produkt/#{produkt['id']}"
-                input type="submit" value="Ta bort produkten"
+                form method="post" action='/produkt/#{produkt["id"]}/delete'
+                    input type="submit" value="Ta bort produkten"
+
+                form method="post" action='/produkt/#{produkt["id"]}/update'
+                    input type="text" name="titel" placeholder="titel" value='#{produkt["titel"]}'
+                    input type="text" name="beskrivning" placeholder="beskrivning" value='#{produkt["beskrivning"]}'
+                    input type="number" name="pris"  placeholder="pris" value='#{produkt["pris"]}'
+                    input type="submit" value="uppdatera"
 script src="/js/main.js/"
 
  
